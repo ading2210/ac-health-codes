@@ -1,4 +1,5 @@
 import requests, json, random, time, threading
+from datetime import datetime
 from flask import Flask, render_template, request
 app = Flask(__name__)
 
@@ -102,6 +103,44 @@ def homepage():
 @app.route("/map")
 def map():
   return render_template("map.html")
+
+@app.route("/launch")
+def launch():
+  return render_template("launch.html")
+
+@app.route("/details")
+def get_details():
+  facility_id = request.args.get("id")
+  if facility_id == None:
+    return "No ID provided"
+  found = False
+  for restaurant in data_alameda["features"]:
+    id = restaurant["attributes"]["Facility_ID"]
+    if facility_id == id:
+      restaurant = restaurant["attributes"]
+      found = True
+      break
+  if found:
+    grade = restaurant["Grade"]
+    if grade == "G":
+      grade_pretty = "Pass"
+    elif grade == "Y":
+      grade_pretty = "Conditional Pass"
+    elif grade == "R":
+      grade_pretty = "Closed"
+    else:
+      grade_pretty = grade
+    data_formatted = {
+      "name": restaurant["Facility_Name"].title(),
+      "address": restaurant["Facility_Name"].title() + ", " + restaurant["City"].title(),
+      "violation": restaurant["Violation_Description"],
+      "date": datetime.utcfromtimestamp(restaurant["Activity_Date"]//1000).strftime("%m-%d-%y"),
+      "grade": grade_pretty,
+      "grade_letter": grade
+    }
+    return render_template("details.html", **data_formatted)
+  else:
+    return "ID not found"
 
 @app.route("/api/alameda/all")
 def alameda_api():

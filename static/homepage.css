@@ -3,6 +3,9 @@
 html {
   margin: 0;
   padding: 0;
+  overflow: hidden;
+  height: 100%;
+  background-image: linear-gradient(to bottom right, #0071eb, #33bc01);
 }
 h1, p {
   font-family: 'Poppins';
@@ -34,7 +37,7 @@ p {
 }
 
 #desc2{
-  margin-top:50%;
+
 }
 
 body {
@@ -50,9 +53,6 @@ body {
   margin: 0;
   padding: 0;
   display: flex;
-  overflow: hidden;
-  height: 100%;
-  background-image: linear-gradient(to bottom right, #0071eb, #33bc01);
 }
 
 #left_div, #right_div, #description {
