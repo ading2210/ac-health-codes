@@ -8,13 +8,13 @@ data_alameda, data_alameda_named = None, None
 
 def cache_refresh():
   while True:
-    time.sleep(600)
-    print("Refreshing the cache!")
+    time.sleep(6000)
     get_data_alameda()
 threading.Thread(target=cache_refresh, daemon=True).start()
 
 #refresh the cache
 def get_data_alameda():
+  print("Refreshing the cache!")
   data_alameda = requests.get(alameda_endpoint).json()
   f = open("cache/alameda.json", "w")
   f.write(json.dumps(data_alameda, indent=2))
@@ -99,6 +99,11 @@ def alameda_api():
   data = json.loads(f.read())
   f.close()
   return data
+
+@app.route("/api/alameda/refresh_cache")
+def alameda_api_refresh():
+  get_data_alameda()
+  return "done."
 
 @app.route("/api/alameda/location")
 def alameda_api_location():

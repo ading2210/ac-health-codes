@@ -10,6 +10,15 @@ html, body {
   width: 100%;
 }
 
+#search_bar {
+  display: flex;
+}
+
+#sidebar {
+  text-align: top;
+  height: 100%;
+}
+
 :root {
     --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
 }
