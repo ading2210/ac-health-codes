@@ -1,36 +1,20 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body {
-  padding: 25px;
-  background-color: white;
-  color: black;
-  font-size: 25px;
-}
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/homepage.css">
+    <link rel="icon" type="image/x-icon" href="/static/img/icon.png">
+    <title>AC Health Code Violations</title>
+  </head>
+    
+  <body>  
+    <div id="text_div">
+      <h1>Alameda County Restaurant Health Code Violations</h1>
+      <p id="description">Our project is based around helping people find the health and safety of the various restaurants around their community. This map will show them real-time data on their favorite restaurants and these restaurants’ health code violations if any. </p>
+      <form action="/map">
+        <input type="submit" class="link_button" value="Launch the map" />
 
-.dark-mode {
-  background-color:#373737;
-  color: white;
-}
-</style>
-</head>
-<body>
-
-<h1>Alameda County Restaurant Health Code Violations</h1>
-
-<button style="font=family: Comic Sans MS;" onclick="myFunction()">Toggle dark mode</button> 
-
-<script>
-function myFunction() {
-   var element = document.body;
-  
-   element.classList.toggle("dark-mode");
-}
-</script>
- 
-<body style="font-family:Comic Sans MS;" >
-  
-</body>
+      </form>
+    </div>
+  </body>
 </html>

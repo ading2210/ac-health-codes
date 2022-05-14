@@ -1,4 +1,3 @@
-
 var map = L.map('map').setView([37.6604, -121.8758], 13);
 
 L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
@@ -6,55 +5,52 @@ L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
     className: 'map-tiles'
 }).addTo(map);
 
+var layer_group = L.layerGroup();
+layer_group.addTo(map);
+
 var marker = L.marker([51.5, -0.09]).addTo(map);
 
-function pullData() {
+function pullData(lng, lat, diff) {
   console.log("Fetching data...");
-  $.ajax({
-    url: "https://hackathon-again.uniqueostrich18.repl.co/api/alameda/location?long=37.6608268&lat=-121.8753042&diff=10&limit=500",
+  var query = "location?long=" + String(lng) + "&lat=" + String(lat) + "&diff=" + String(diff) + "&limit=" + String(500);
+  
+    $.ajax({
+      url: "/api/alameda/" + query,
       type: "GET",
     
-  }).done(function(data) {
-    var businessData = JSON.parse(data);
-    sfRestrauntData = businessData;
-
-    //changed the api to sort by name
-    //adding markers to map
-    for (var i = 0; i < businessData.length; i++) {
-      var item = businessData[i];
-      if(item.hasOwnProperty('business_latitude')){
-        var marker = L.marker([item.business_latitude, item.business_longitude], {
-          title: item.business_name
+    }).done(function(data) {
+      for (var i = 0; i < data.restaurants.length; i++) {
+        var item = data.restaurants[i];
+        var marker = L.marker([item.geometry.y, item.geometry.x], {
+          title: item.attributes.Facility_Name
         }).addTo(map);
-
-        var year = item.inspection_date.split('-')[0]
-
-        if(item.inspection_score === undefined) {
-          item.inspection_score = "No Score Available"
-        }
-
-        if(item.risk_category === undefined) {
-          item.risk_category = "No Rating Available"
-        }
-
-        if(item.violation_description === undefined) {
-          item.violation_description = "No Description Available"
-        }
-
-        
-        var popupHTML = (`
-          <body>
-            <h1>${toTitleCase(item.business_name)}</h1>
-            <b>Address:</b> ${toTitleCase(item.business_address)}<br>
-            <b>Inspection Year</b>:  ${year}<br>
-            <b>Inspection Score</b>: ${item.inspection_score}<br>
-            <b>Violation Risk</b>:  ${item.risk_category}<br>
-            <b>Violation Type</b>:  ${item.violation_description}<br>
-          </body>
-          `);
-        marker.bindPopup(popupHTML);
-        markerList.push(marker);
+        layer_group.addLayer(marker);
       }
-    }
-  });
+    });
 
+
+}
+
+var old_lng;
+var old_lat;
+
+map.on("moveend", function () {
+  var center = map.getCenter();
+  var bounds = map.getBounds()._northEast;
+  var diff1 = Math.abs(center.lat-bounds.lat)
+  var diff2 = Math.abs(center.lng-bounds.lng)
+  var diff = Math.max(diff1, diff2)
+  if(old_lng == undefined) {
+    
+    
+  } else if(old_lng - map.getCenter().lng >= 0.025 || old_lat - map.getCenter().lat >= 0.025) {
+    layer_group.clearLayers();
+    pullData(map.getCenter().lat, map.getCenter().lng, diff)    
+  } else if(old_lng - map.getCenter().lng <= -0.025 || old_lat - map.getCenter().lat <= -0.025) {
+    layer_group.clearLayers();
+    pullData(map.getCenter().lat, map.getCenter().lng, diff)
+  }
+  
+  old_lng = map.getCenter().lng;
+  old_lat = map.getCenter().lat;
+});
