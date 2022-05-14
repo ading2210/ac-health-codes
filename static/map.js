@@ -55,6 +55,9 @@ function pullData(lng, lat, diff) {
           grade = "Pass";
         } else if (grade == "Y") {
           grade = "Conditional Pass"
+        }
+        else if (grade == "R") {
+          grade = "Closed"
         };
         var popupHTML = (`
           <body>
@@ -84,7 +87,7 @@ map.on("moveend", function () {
   if(marker_click == false) {
     updateMap()
   }
-});
+});  
 
 function updateMap() {
   var center = map.getCenter();
@@ -98,5 +101,38 @@ function updateMap() {
 }
 
 function search() {
-  var text = document.getElementById("myText").value;
+  var text = document.getElementById("search").value;
+  var table = document.getElementById("results_table");
+  table.innerHTML = "";
+  var query = "search?query="+text+"&limit=50";
+  $.ajax({
+      url: "/api/alameda/" + query,
+      type: "GET",
+    
+    }).done(function(data) {
+    if (data.restaurants.length > 0) {
+      var row;
+      var cell;
+      var restaurantHTML;
+      var restaurant;
+      for (let i=0; i<data.restaurants.length; i++) {
+        restaurant = data.restaurants[i];
+        row = table.insertRow(-1);
+        cell = row.insertCell(0);
+        cell.className = "table_cell";
+        cell.innerHTML = (`
+        <div> 
+          <p style="margin: 0px">${toTitleCase(restaurant.attributes.Facility_Name)}</p>
+          <p style="font-size: 12px; margin: 0px">${toTitleCase(restaurant.attributes.Address+", "+restaurant.attributes.City)}</p>
+        </div>
+        `);
+        
+      }
+    }
+    else {
+      var row = table.insertRow(-1);
+      var cell = row.insertCell(0);
+      cell.innerHTML = "No results found."
+    }
+  })
 }

@@ -10,7 +10,7 @@ def cache_refresh():
   while True:
     time.sleep(6000)
     get_data_alameda()
-threading.Thread(target=cache_refresh, daemon=True).start()
+#threading.Thread(target=cache_refresh, daemon=True).start()
 
 #refresh the cache
 def get_data_alameda():
@@ -21,11 +21,21 @@ def get_data_alameda():
   f.close()
 
   data_named = {}
+  data_address = {}
   for restaurant in data_alameda["features"]:
+    address = restaurant["attributes"]["Address"]
+    if address in data_address:
+      timestamp = restaurant["attributes"]["Activity_Date"]
+      if timestamp < data_address[address]["attributes"]["Activity_Date"]:
+        continue
+    data_address[address] = restaurant
+  for address in data_address.keys(): 
+    restaurant = data_address[address]
     name = restaurant["attributes"]["Facility_Name"]
     if name in data_named:
-      name = name +"_"+str(random.randint(0, 100))
+      name += " " + str(random.randint(0, 100))
     data_named[name] = restaurant
+    
   data_alameda_named = data_named
   f2 = open("cache/alameda_named.json", "w")
   f2.write(json.dumps(data_named, indent=2))
