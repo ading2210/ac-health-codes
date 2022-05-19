@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+* {
+  font-family: Poppins;
+}
+
+.item {
+  font-size: 12px;
+}
+
+#main_table {
+  width: 100%;
+}

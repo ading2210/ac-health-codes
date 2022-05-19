@@ -3,21 +3,21 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/static/details.css">
-    <link rel="icon" type="image/x-icon" href="/static/img/icon.png">
+    <link rel="icon" type="image/x-icon" href="/static/img/icon.ico">
     <title>Restaurant Details</title>
   </head>
     
   <body>
     <table id="main_table">
-      <tr>
-        <td>
-          <h3>{{name}}</h3>
-          <p><b>Address:</b> {{address}}</p>
-          <p><b>Violation description:</b> {{violation}}</p>
-          <p><b>Grade:</b> {{grade}}</p>
-          <p><b>Latest inspection:</b> {{date}}</p>
+      <tr style="width: 100%">
+        <td style="max-width: 100%">
+          <p>{{name}}</p>
+          <p class="item"><b>Address:</b> {{address}}</p>
+          <p class="item"><b>Description:</b> {{violation}}</p>
+          <p class="item"><b>Grade:</b> {{grade}}</p>
+          <p class="item"><b>Latest inspection:</b> {{date}}</p>
         </td>
-        <td>
+        <td style="width: 115px">
           <img src="https://ehgone.acgov.org/inspection/results/CONTENT/PCARDS/{{grade_letter}}.PNG">
         </td>
       </tr>

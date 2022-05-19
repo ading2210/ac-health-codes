@@ -1,6 +1,7 @@
 var map = L.map('map').setView([37.6604, -121.8758], 13);
 
 var marker_click = false;
+var markerList = [];
 
 L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -33,6 +34,7 @@ function toTitleCase(value) {
 
 function pullData(lng, lat, diff) {
   console.log("Fetching data...");
+  marker_list = [];
   var query = "location?long=" + String(lng) + "&lat=" + String(lat) + "&diff=" + String(diff) + "&limit=" + String(200);
   
     $.ajax({
@@ -66,14 +68,16 @@ function pullData(lng, lat, diff) {
             <b>Inspection date</b>:  ${time}<br>
             <b>Grade</b>:  ${grade}<br>
             <b>Description</b>:  ${item.attributes.Violation_Description}<br>
+            <b>More Details:</b><a href="javascript: window.open('/details?id=${item.attributes.Facility_ID}', 'Restaurant Details', 'width=400,height=250')"> Details</a>
           </body>
           `);
         marker.bindPopup(popupHTML);
+        markerList.push(marker);
         
         marker.on('click', function(e) {
           marker_click = true;
         });
-        //markerList.push(marker);
+        markerList.push(marker);
       }
       
     });
@@ -100,6 +104,27 @@ function updateMap() {
   pullData(map.getCenter().lat, map.getCenter().lng, diff)    
 }
 
+function openMarker(y, x) {
+  map.panTo(new L.LatLng(y, x));
+  map.setZoom(15); 
+  //updateMap();
+  //console.log(markerList);
+  //findMarker(name)
+}
+
+function findMarker(name) {
+  for(var i = 0; i < markerList.length; i++) {
+    var item = markerList[i]
+    var markerName = item.options.title;
+
+    if(markerName == name) {
+      item.openPopup();
+      break;
+    }
+  }
+  
+}
+
 function search() {
   var text = document.getElementById("search").value;
   var table = document.getElementById("results_table");
@@ -110,13 +135,29 @@ function search() {
       type: "GET",
     
     }).done(function(data) {
+
     if (data.restaurants.length > 0) {
+
+      
       var row;
       var cell;
       var restaurantHTML;
       var restaurant;
+      var grade;
       for (let i=0; i<data.restaurants.length; i++) {
         restaurant = data.restaurants[i];
+        grade = restaurant.attributes.Grade;
+        if (grade === "G" || grade === "g") {
+          grade = "Pass";
+        } else if (grade === "Y" || grade === "y") {
+          grade = "Conditional Pass";
+        }
+        else if (grade === "R" || grade === "r") {
+          grade = "Closed";
+        }
+        else {
+          grade = "Unknown";
+        };
         row = table.insertRow(-1);
         cell = row.insertCell(0);
         cell.className = "table_cell";
@@ -124,6 +165,9 @@ function search() {
         <div> 
           <p style="margin: 0px">${toTitleCase(restaurant.attributes.Facility_Name)}</p>
           <p style="font-size: 12px; margin: 0px">${toTitleCase(restaurant.attributes.Address+", "+restaurant.attributes.City)}</p>
+          <p style="font-size: 12px; margin: 0px">Grade: ${grade}</p>
+          <p style="font-size: 12px; margin: 0px"><a href="javascript: window.open('/details?id=${restaurant.attributes.Facility_ID}', 'Restaurant Details', 'width=400,height=250')">Details</a> | <a href="javascript: openMarker(${restaurant.geometry.y}, ${restaurant.geometry.x});">Locate On Map</a></p>
+          
         </div>
         `);
         

@@ -1,6 +1,6 @@
 import requests, json, random, time, threading
 from datetime import datetime
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 app = Flask(__name__)
 
 alameda_endpoint = "https://services5.arcgis.com/ROBnTHSNjoZ2Wm1P/arcgis/rest/services/Restaurant_Inspections/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
@@ -11,7 +11,7 @@ def cache_refresh():
   while True:
     time.sleep(6000)
     get_data_alameda()
-#threading.Thread(target=cache_refresh, daemon=True).start()
+threading.Thread(target=cache_refresh, daemon=True).start()
 
 #refresh the cache
 def get_data_alameda():
@@ -95,6 +95,12 @@ try:
   f2.close()
 except:
   get_data_alameda()
+  f1 = open("cache/alameda.json")
+  data_alameda = json.loads(f1.read())
+  f1.close()
+  f2 = open("cache/alameda_named.json")
+  data_alameda_named = json.loads(f2.read())
+  f2.close()
 
 @app.route('/')
 def homepage():
@@ -103,6 +109,10 @@ def homepage():
 @app.route("/map")
 def map():
   return render_template("map.html")
+
+@app.route("/favicon.ico")
+def favicon():
+  return send_from_directory("static", "static/img/icon.ico")
 
 @app.route("/launch")
 def launch():
@@ -129,7 +139,8 @@ def get_details():
     elif grade == "R":
       grade_pretty = "Closed"
     else:
-      grade_pretty = grade
+      grade_pretty = "Unknown"
+      grade = "N"
     data_formatted = {
       "name": restaurant["Facility_Name"].title(),
       "address": restaurant["Facility_Name"].title() + ", " + restaurant["City"].title(),
